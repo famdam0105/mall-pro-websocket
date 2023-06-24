@@ -1,0 +1,107 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <title>My WebSocket</title>
+    <meta charset="UTF-8">
+</head>
+
+<body>
+<input id="text" type="text" />
+<button onclick="send()">Send</button>
+<button onclick="closeWebSocket()">Close</button>
+<button onclick="send02()">binary-button</button>
+<div id="message"></div>
+
+
+</body>
+
+<script type="text/javascript">
+
+    let ws = null;
+    //判断当前浏览器是否支持WebSocket
+    if ('WebSocket' in window) {
+        ws = new WebSocket("ws://localhost:8080/myWs");
+    }
+    else {
+        alert('当前浏览器 Not support websocket')
+    }
+
+    //连接发生错误的回调方法
+    ws.onerror = function () {
+        setMessageInnerHTML("WebSocket连接发生错误");
+    };
+
+    //连接成功建立的回调方法
+    ws.onopen = function(event) {
+        console.log("ws调用连接成功回调方法")
+        //ws.send("")
+    }
+
+    //接收到消息的回调方法
+    ws.onmessage = function(message) {
+        console.log("接收消息：" + message.data);
+        if (typeof(message.data) == 'string') {
+            setMessageInnerHTML(message.data);
+        }
+    }
+
+    //接收到二进制消息的回调方法---me--problem
+    // 定义接收二进制消息的回调方法
+    // ws.binaryType = 'arraybuffer'; // 设置二进制类型为 ArrayBuffer
+    //
+    // ws.onmessage = function (event) {
+    //     const arrayBuffer = event.data;
+    //
+    //     // 在此处进行二进制消息的处理
+    //     // 可以使用 TypedArray 或 DataView 对象来操作 ArrayBuffer
+    //
+    //     // 示例：将二进制数据转换为字符串
+    //     const textDecoder = new TextDecoder('utf-8');
+    //     const message = textDecoder.decode(arrayBuffer);
+    //     setMessageInnerHTML(message);
+    //     setMessageInnerHTML(arrayBuffer);
+    //     console.log('Received binary message:', message);
+    // };
+
+
+
+    //ws连接断开的回调方法
+    ws.onclose = function(e) {
+        console.log("ws连接断开")
+        //console.log(e)
+        setMessageInnerHTML("ws close");
+    }
+
+    //将消息显示在网页上
+    function setMessageInnerHTML(innerHTML) {
+        console.log(innerHTML)
+        document.getElementById('message').innerHTML += '接收的消息:' + innerHTML + '<br/>';
+    }
+
+    //关闭连接
+    function closeWebSocket() {
+        ws.close();
+    }
+
+
+    //发送消息
+    function send(msg) {
+        if(!msg){
+            msg = document.getElementById('text').value;
+            document.getElementById('message').innerHTML += "发送的消息:" + msg + '<br/>';
+            ws.send(msg);
+        }
+    }
+    //发送二进制文件，
+    function send02() {
+        var binaryData = new Uint8Array(4);
+        binaryData[0] = 0x01;
+        binaryData[1] = 0x23;
+        binaryData[2] = 0x45;
+        binaryData[3] = 0x67;
+        ws.send(binaryData);
+    }
+
+</script>
+</html>
+
