@@ -37,6 +37,10 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
+
+<!--        新增用于传json数组的依赖-->
+
+
     </dependencies>
 
     <build>
